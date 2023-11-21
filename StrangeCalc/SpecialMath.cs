@@ -6,7 +6,7 @@ namespace StrangeCalc;
 /// </summary>
 public static class SpecialMath
 {
-    const bool USE_REAL_MATH = true;
+    const bool USE_REAL_MATH = false;
 
     public static double Add(double a, double b)
     {
