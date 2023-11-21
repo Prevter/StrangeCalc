@@ -25,6 +25,9 @@ public sealed class Lexer
     public Token NextToken()
     {
         Token token = NextTokenInternal();
+#if DEBUG
+        Console.WriteLine(token);
+#endif
         return token;
     }
 
@@ -221,6 +224,7 @@ public sealed class Lexer
             { '\\', '\\' },
             { '"', '"' },
             { '\'', '\'' },
+            { '0', '\0' },
         };
 
         while (_currentChar != null && (_currentChar != '"' || escape))
@@ -230,6 +234,20 @@ public sealed class Lexer
                 if (escapeDict.ContainsKey(_currentChar.Value))
                 {
                     str += escapeDict[_currentChar.Value];
+                }
+                else if (_currentChar.Value == 'x' || _currentChar.Value == 'u')
+                {
+                    int max = _currentChar.Value == 'x' ? 2 : 4;
+                    int count = 0;
+                    string hex = "";
+                    while (count++ < max)
+                    {
+                        Advance();
+                        if (_currentChar is null || !char.IsLetterOrDigit(_currentChar.Value)) break;
+                        hex += _currentChar;
+                    }
+                    if (hex.Length == 0) throw new Exception($"Invalid escape character: {_currentChar}");
+                    str += (char)Convert.ToInt32(hex, 16);
                 }
                 else
                 {
@@ -302,6 +320,11 @@ public sealed class Lexer
             Advance();
             return new Token(TokenType.Equals, "==", posStart, _position);
         }
+        else
+        {
+            // go back
+            _position = posStart.Copy();
+        }
 
         return new Token(TokenType.Assign, "=", posStart);
     }
@@ -315,6 +338,11 @@ public sealed class Lexer
         {
             Advance();
             return new Token(TokenType.NotEquals, "!=", posStart, _position);
+        }
+        else
+        {
+            // go back
+            _position = posStart.Copy();
         }
 
         return new Token(TokenType.Not, "!", posStart);
@@ -330,6 +358,11 @@ public sealed class Lexer
             Advance();
             return new Token(TokenType.GreaterThanOrEqual, ">=", posStart, _position);
         }
+        else
+        {
+            // go back
+            _position = posStart.Copy();
+        }
 
         return new Token(TokenType.GreaterThan, ">", posStart);
     }
@@ -343,6 +376,11 @@ public sealed class Lexer
         {
             Advance();
             return new Token(TokenType.LessThanOrEqual, "<=", posStart, _position);
+        }
+        else
+        {
+            // go back
+            _position = posStart.Copy();
         }
 
         return new Token(TokenType.LessThan, "<", posStart);
@@ -358,6 +396,11 @@ public sealed class Lexer
             Advance();
             return new Token(TokenType.And, "&&", posStart, _position);
         }
+        else
+        {
+            // go back
+            _position = posStart.Copy();
+        }
 
         return new Token(TokenType.BitwiseAnd, "&", posStart);
     }
@@ -371,6 +414,11 @@ public sealed class Lexer
         {
             Advance();
             return new Token(TokenType.Or, "||", posStart, _position);
+        }
+        else
+        {
+            // go back
+            _position = posStart.Copy();
         }
 
         return new Token(TokenType.BitwiseOr, "|", posStart);

@@ -1,4 +1,5 @@
-﻿using StrangeCalc.Nodes;
+﻿using StrangeCalc.Exceptions;
+using StrangeCalc.Nodes;
 
 namespace StrangeCalc;
 
@@ -190,6 +191,10 @@ public sealed class Parser
         {
             result = ParseIfStatement();
         }
+        else if (_currentToken.Type == TokenType.LeftBrace)
+        {
+            result = ParseCodeBlock();
+        }
         else
         {
             result = ParseExpression();
@@ -368,7 +373,7 @@ public sealed class Parser
                 break;
 
             default:
-                throw UnexpectedToken(_currentToken);
+                throw UnexpectedToken(_currentToken, "[String, Number, Identifier, LeftParenthesis]");
         }
 
         return result;
@@ -376,8 +381,17 @@ public sealed class Parser
 
     private INode ParseString()
     {
-        var result = new StringNode(_currentToken);
+        INode result = new StringNode(_currentToken);
         Eat(TokenType.String);
+
+        if (_currentToken.Type == TokenType.LeftBracket)
+        {
+            Eat(TokenType.LeftBracket);
+            var index = ParseExpression();
+            Eat(TokenType.RightBracket);
+            result = new IndexNode(result, index);
+        }
+
         return result;
     }
 
@@ -398,19 +412,27 @@ public sealed class Parser
             result = new AssignmentNode(result, new UnaryOpNode(_currentToken, result));
             Eat(_currentToken.Type);
         }
+        else if (_currentToken.Type == TokenType.LeftBracket)
+        {
+            Eat(TokenType.LeftBracket);
+            var index = ParseExpression();
+            Eat(TokenType.RightBracket);
+            result = new IndexNode(result, index);
+        }
 
         return result;
     }
 
     private void Eat(IEnumerable<TokenType> types)
     {
-        if (types.Contains(_currentToken.Type))
+        if (CheckTokenTypes(_currentToken, types))
         {
             _currentToken = Lexer.NextToken();
         }
         else
         {
-            throw UnexpectedToken(_currentToken);
+            string expected = $"[{string.Join(", ", types.Select(t => t.ToString()))}]";
+            throw UnexpectedToken(_currentToken, expected);
         }
     }
 
@@ -422,7 +444,7 @@ public sealed class Parser
         }
         else
         {
-            throw UnexpectedToken(_currentToken);
+            throw UnexpectedToken(_currentToken, type.ToString());
         }
     }
 
@@ -431,8 +453,15 @@ public sealed class Parser
         return types.Contains(token.Type);
     }
 
-    private static Exception UnexpectedToken(Token token)
+    private static Error UnexpectedToken(Token token, string? expected = null)
     {
-        return new Exception($"Unexpected token: {token.Type} '{token.Value}' at position {token.Start}");
+        if (expected is null)
+        {
+            return new UnexpectedTokenError(token.Start, token.End, $"Unexpected token {token.Type}");
+        }
+        else
+        {
+            return new UnexpectedTokenError(token.Start, token.End, $"Expected token {expected}, got {token.Type}");
+        }
     }
 }

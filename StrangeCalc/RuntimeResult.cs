@@ -47,6 +47,7 @@ public sealed class RuntimeResult
 			double number => number.ToString(CultureInfo.InvariantCulture),
 			bool boolean => boolean.ToString(),
 			string text => text,
+			object[] array => $"[{string.Join(", ", array.Select(x => x is null ? "null" : x.ToString()))}]",
 			Function func => func.ToString(),
 			_ => "null"
 		};

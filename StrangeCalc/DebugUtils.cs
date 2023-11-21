@@ -19,6 +19,7 @@ public static class DebugUtils
             BlockNode blockNode => VisitBlockNode(blockNode, indent),
             IfNode ifNode => VisitIfNode(ifNode, indent),
             ForNode forNode => VisitForNode(forNode, indent),
+            IndexNode indexNode => VisitIndexNode(indexNode, indent),
             _ => throw new Exception($"Unexpected node type: {node.GetType().Name}")
         }).TrimEnd();
     }
@@ -111,6 +112,15 @@ public static class DebugUtils
         result.AppendLine(PrintAST(node.Condition, indent + 1));
         result.AppendLine(PrintAST(node.Increment, indent + 1));
         result.AppendLine(PrintAST(node.Body, indent + 1));
+        return result.ToString();
+    }
+
+    private static string VisitIndexNode(IndexNode node, int indent)
+    {
+        var result = new StringBuilder();
+        result.AppendLine($"{new string(' ', indent)}IndexNode:");
+        result.AppendLine(PrintAST(node.Value, indent + 1));
+        result.AppendLine(PrintAST(node.Indexer, indent + 1));
         return result.ToString();
     }
 }

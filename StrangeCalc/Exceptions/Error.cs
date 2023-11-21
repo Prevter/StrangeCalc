@@ -52,7 +52,7 @@ public class Error : Exception
     public override string ToString()
     {
         return $"{Name}: {Details}\n" +
-               $"  File {Start.Filename}, line {Start.Line + 1}\n";
+               $"  File {Start.Filename}, line {Start.Line + 1}, column {Start.Column}\n";
         //$"{ArrowString(PositionStart.Filetext, PositionStart, PositionEnd)}"
     }
 

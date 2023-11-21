@@ -11,7 +11,21 @@ public static class BuiltInFunctions
 
     public static RuntimeResult Print(IEnumerable<object?> args)
     {
-        Console.WriteLine(string.Join(" ", args));
+        foreach (var arg in args)
+        {
+            if (arg is IEnumerable<object> array)
+            {
+                Console.Write("[" + string.Join(", ", array.Select(x => x is null ? "null" : x.ToString())) + "]");
+            }
+            else if (arg is null)
+            {
+                Console.Write("null");
+            }
+            else
+            {
+                Console.Write(arg.ToString());
+            }
+        }
         return RuntimeResult.Success(null);
     }
 
@@ -24,7 +38,7 @@ public static class BuiltInFunctions
 
         if (args.ElementAt(0) is string format)
         {
-            Console.Write(format, args.Skip(1).ToArray());
+            Console.Write(string.Format(format, args.Skip(1).ToArray()));
             return RuntimeResult.Success(null);
         }
 
@@ -95,6 +109,24 @@ public static class BuiltInFunctions
     {
         Console.Clear();
         return RuntimeResult.Success(null);
+    }
+
+    public static RuntimeResult Sleep(IEnumerable<object?> args)
+    {
+        if (args.Count() != 1)
+        {
+            return RuntimeResult.Failure(new RuntimeError(InternalCodePosition, InternalCodePosition, "sleep() takes exactly 1 argument", Context.Root));
+        }
+
+        if (args.ElementAt(0) is double value)
+        {
+            Thread.Sleep((int)value);
+            return RuntimeResult.Success(null);
+        }
+        else
+        {
+            return RuntimeResult.Failure(new RuntimeError(InternalCodePosition, InternalCodePosition, "sleep() takes only numbers", Context.Root));
+        }
     }
 
     #endregion
@@ -589,4 +621,38 @@ public static class BuiltInFunctions
 
     #endregion
 
+    #region Array functions
+
+    public static RuntimeResult CreateArray(IEnumerable<object?> args)
+    {
+        // parameters: length, default value
+        if (args.Count() == 1)
+        {
+            if (args.ElementAt(0) is double length)
+            {
+                return RuntimeResult.Success(Enumerable.Repeat<object>(null, (int)length).ToArray());
+            }
+            else
+            {
+                return RuntimeResult.Failure(new RuntimeError(InternalCodePosition, InternalCodePosition, "arr() takes only numbers", Context.Root));
+            }
+        }
+        else if (args.Count() == 2)
+        {
+            if (args.ElementAt(0) is double length && args.ElementAt(1) is not null)
+            {
+                return RuntimeResult.Success(Enumerable.Repeat<object>(args.ElementAt(1), (int)length).ToArray());
+            }
+            else
+            {
+                return RuntimeResult.Failure(new RuntimeError(InternalCodePosition, InternalCodePosition, "arr() takes only numbers and values", Context.Root));
+            }
+        }
+        else
+        {
+            return RuntimeResult.Failure(new RuntimeError(InternalCodePosition, InternalCodePosition, "arr() takes 1 or 2 arguments", Context.Root));
+        }
+    }
+
+    #endregion
 }

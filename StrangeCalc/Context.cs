@@ -20,8 +20,8 @@ public sealed class Context
         {
             Root = this;
             // Built-in constants
-            Variables.Add("pi", new Variable(Math.PI, true));
-            Variables.Add("e", new Variable(Math.E, true));
+            Variables.Add("PI", new Variable(Math.PI, true));
+            Variables.Add("E", new Variable(Math.E, true));
             Variables.Add("null", new Variable(null, true));
             Variables.Add("true", new Variable(true, true));
             Variables.Add("false", new Variable(false, true));
@@ -32,6 +32,7 @@ public sealed class Context
             Variables.Add("sprintf", new Variable(new Function("sprintf", BuiltInFunctions.SPrintf), true));
             Variables.Add("scanf", new Variable(new Function("scanf", BuiltInFunctions.Scanf), true));
             Variables.Add("clear", new Variable(new Function("clear", BuiltInFunctions.Clear), true));
+            Variables.Add("sleep", new Variable(new Function("sleep", BuiltInFunctions.Sleep), true));
 
             Variables.Add("sin", new Variable(new Function("sin", BuiltInFunctions.Sin), true));
             Variables.Add("cos", new Variable(new Function("cos", BuiltInFunctions.Cos), true));
@@ -63,6 +64,8 @@ public sealed class Context
             Variables.Add("len", new Variable(new Function("len", BuiltInFunctions.Length), true));
             Variables.Add("substr", new Variable(new Function("substr", BuiltInFunctions.Substring), true));
             Variables.Add("replace", new Variable(new Function("replace", BuiltInFunctions.Replace), true));
+
+            Variables.Add("createArray", new Variable(new Function("createArray", BuiltInFunctions.CreateArray), true));
         }
     }
 

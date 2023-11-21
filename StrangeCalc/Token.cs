@@ -10,7 +10,7 @@ namespace StrangeCalc;
 public sealed class Token
 {
 	public TokenType Type { get; }
-	public string Value { get; }
+	public string Value { get; set; }
 	public CodePosition? Start { get; }
 	public CodePosition? End { get; }
 
