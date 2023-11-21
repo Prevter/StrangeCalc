@@ -87,6 +87,7 @@ public sealed class Context
 
     public void SetVariable(string name, object? value, bool constant = false)
     {
+        
         if (Variables.ContainsKey(name))
         {
             if (Variables[name].IsConstant)
@@ -98,10 +99,9 @@ public sealed class Context
         }
         else
         {
-            if (Parent is not null)
+            if (Parent is not null && Parent.GetVariable(name) != null)
             {
-                if (Parent.GetVariable(name) != null)
-                    Parent.SetVariable(name, value, constant);
+                Parent.SetVariable(name, value, constant);
             }
             else
             {

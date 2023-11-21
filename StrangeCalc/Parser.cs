@@ -19,7 +19,7 @@ public sealed class Parser
 
         while (_currentToken.Type != TokenType.EOF)
         {
-            result.Add(ParseIfStatement());
+            result.Add(ParseStatement());
         }
 
         return result;
@@ -27,64 +27,54 @@ public sealed class Parser
 
     private INode ParseForLoop()
     {
-        if (_currentToken.Type == TokenType.Identifier && _currentToken.Value == "for")
-        {
-            Eat(TokenType.Identifier);
-            Eat(TokenType.LeftParenthesis);
-            var init = ParseExpression();
-            Eat(TokenType.Semicolon);
-            var condition = ParseExpression();
-            Eat(TokenType.Semicolon);
-            var increment = ParseExpression();
-            Eat(TokenType.RightParenthesis);
-            var body = ParseCodeBlock();
+        Eat(TokenType.Identifier);
+        Eat(TokenType.LeftParenthesis);
+        var init = ParseExpression();
+        Eat(TokenType.Semicolon);
+        var condition = ParseExpression();
+        Eat(TokenType.Semicolon);
+        var increment = ParseExpression();
+        Eat(TokenType.RightParenthesis);
+        var body = ParseCodeBlock();
 
-            return new ForNode(init, condition, increment, body);
-        }
-
-        return ParseIfStatement();
+        return new ForNode(init, condition, increment, body);
     }
 
     private INode ParseIfStatement()
     {
-        if (_currentToken.Type == TokenType.Identifier && _currentToken.Value == "if")
+        Eat(TokenType.Identifier);
+        Eat(TokenType.LeftParenthesis);
+        var condition = ParseExpression();
+        Eat(TokenType.RightParenthesis);
+        var body = ParseCodeBlock();
+
+        List<(INode condition, INode body)> conditions = new()
+        {
+            (condition, body)
+        };
+        INode? elseBody = null;
+
+        while (_currentToken.Type == TokenType.Identifier && _currentToken.Value == "else")
         {
             Eat(TokenType.Identifier);
-            Eat(TokenType.LeftParenthesis);
-            var condition = ParseExpression();
-            Eat(TokenType.RightParenthesis);
-            var body = ParseCodeBlock();
 
-            List<(INode condition, INode body)> conditions = new()
-            {
-                (condition, body)
-            };
-            INode? elseBody = null;
-
-            while (_currentToken.Type == TokenType.Identifier && _currentToken.Value == "else")
+            if (_currentToken.Type == TokenType.Identifier && _currentToken.Value == "if")
             {
                 Eat(TokenType.Identifier);
-
-                if (_currentToken.Type == TokenType.Identifier && _currentToken.Value == "if")
-                {
-                    Eat(TokenType.Identifier);
-                    Eat(TokenType.LeftParenthesis);
-                    var elifCondition = ParseExpression();
-                    Eat(TokenType.RightParenthesis);
-                    var elifBody = ParseCodeBlock();
-                    conditions.Add((elifCondition, elifBody));
-                }
-                else
-                {
-                    elseBody = ParseCodeBlock();
-                    break;
-                }
+                Eat(TokenType.LeftParenthesis);
+                var elifCondition = ParseExpression();
+                Eat(TokenType.RightParenthesis);
+                var elifBody = ParseCodeBlock();
+                conditions.Add((elifCondition, elifBody));
             }
-
-            return new IfNode(conditions, elseBody);
+            else
+            {
+                elseBody = ParseCodeBlock();
+                break;
+            }
         }
 
-        return ParseCodeBlock();
+        return new IfNode(conditions, elseBody);
     }
 
     private INode ParseCodeBlock()

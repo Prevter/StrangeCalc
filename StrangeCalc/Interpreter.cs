@@ -272,14 +272,15 @@ public sealed class Interpreter
 
 	private static RuntimeResult VisitForNode(ForNode node, Context context)
 	{
-		var init = Visit(node.Init, context);
+		var local = new Context("<for-loop>", node.Start) { Parent = context };
+		var init = Visit(node.Init, local);
 
 		if (init.Error is not null)
 			return RuntimeResult.Failure(init.Error);
 
 		while (true)
 		{
-			var condition = Visit(node.Condition, context);
+			var condition = Visit(node.Condition, local);
 
 			if (condition.Error is not null)
 				return RuntimeResult.Failure(condition.Error);
@@ -287,12 +288,12 @@ public sealed class Interpreter
 			if (condition.Value is bool boolean && !boolean)
 				break;
 
-			var body = Visit(node.Body, context);
+			var body = Visit(node.Body, local);
 
 			if (body.Error is not null)
 				return RuntimeResult.Failure(body.Error);
 
-			var increment = Visit(node.Increment, context);
+			var increment = Visit(node.Increment, local);
 
 			if (increment.Error is not null)
 				return RuntimeResult.Failure(increment.Error);
