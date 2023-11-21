@@ -1,12 +1,18 @@
-﻿namespace StrangeCalc;
+﻿#pragma warning disable CS0162 // Unreachable code detected
+namespace StrangeCalc;
 
 /// <summary>
 /// Math operations to get funny results
 /// </summary>
 public static class SpecialMath
 {
+    const bool USE_REAL_MATH = true;
+
     public static double Add(double a, double b)
     {
+        if (USE_REAL_MATH)
+            return a + b;
+
         // we do some funny math here
         // should make these calculations:
         // 2 + 2 = 5
@@ -78,6 +84,9 @@ public static class SpecialMath
 
     public static bool Equals(double a, double b)
     {
+        if (USE_REAL_MATH)
+            return a == b;
+
         // who cares about precision anyway
         return Math.Round(a) == Math.Round(b);
     }
