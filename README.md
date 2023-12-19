@@ -69,6 +69,31 @@ print(77 + 33); // 100
 print(pi, pi == 3); // 3.14159265358979323846 True
 ```
 
+## Examples
+Port of the `donut.c` program including the donut shape:
+```js
+           AA=BB=0;for(0;true;
+        0){s=createArray(1760,0);
+      t=createArray(1760,0);AA=AA+
+    0.05;BB=BB+0.07;o=cos(AA);e=sin
+   (AA);n=cos(BB);c=sin(BB);for(i=0;i
+ <1760;i++){if(i%80==79)s[i]="\n";else
+s[i] = " ";t[i]=0;} for(j=0;j<6.28;j=j+
+0.07){r=cos(j);a=sin(j);for(i=0;i<6.28;
+i=i+0.02){l=sin        (i);f=cos(i);A=r
++2;B=1/(l*A*e+          a*o+5);d=l*A*o-
+a*e;m=40+30*B*          (f*A*n-d*c)|0;v
+=12+15*B*(f*A*c        +d*n)|0;I=m+80*v
+;h=8*((a*e-l*r*o)*n-l*r*e-a*o-f*r*c)|0;
+ if(v<22 && v>0&& m>0&& m<80&& B > t[I%
+ 1760]){t[I]=B; if(h<1) s[I]="."; else
+  s[I]=".,-~:;=!*#$@"[h];} }} printf(
+    "\x1b[J\x1b[H{0}",join(s,""));}
+      /*=!!!!!!!!!!!!!!!!!!!==:*/
+        /*~~~~~~~~~~~~~~~~~~*/
+           /*..,-------,.*/
+```
+
 ## How to Use
 1. Clone the repository onto your computer
 ```bash
