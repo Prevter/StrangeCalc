@@ -619,6 +619,23 @@ public static class BuiltInFunctions
         }
     }
 
+    public static RuntimeResult Join(IEnumerable<object?> args)
+    {
+        if (args.Count() != 2)
+        {
+            return RuntimeResult.Failure(new RuntimeError(InternalCodePosition, InternalCodePosition, "join() takes exactly 2 arguments", Context.Root));
+        }
+
+        if (args.ElementAt(0) is IEnumerable<object> value && args.ElementAt(1) is string separator)
+        {
+            return RuntimeResult.Success(string.Join(separator, value.Select(x => x is null ? "" : x.ToString())));
+        }
+        else
+        {
+            return RuntimeResult.Failure(new RuntimeError(InternalCodePosition, InternalCodePosition, "join() takes only arrays and strings", Context.Root));
+        }
+    }
+
     #endregion
 
     #region Array functions

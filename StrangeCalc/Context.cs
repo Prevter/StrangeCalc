@@ -64,6 +64,7 @@ public sealed class Context
             Variables.Add("len", new Variable(new Function("len", BuiltInFunctions.Length), true));
             Variables.Add("substr", new Variable(new Function("substr", BuiltInFunctions.Substring), true));
             Variables.Add("replace", new Variable(new Function("replace", BuiltInFunctions.Replace), true));
+            Variables.Add("join", new Variable(new Function("join", BuiltInFunctions.Join), true));
 
             Variables.Add("createArray", new Variable(new Function("createArray", BuiltInFunctions.CreateArray), true));
         }
